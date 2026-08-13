@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Ruff lint
+        run: python -m ruff check src scripts dags tests
+
+      - name: Unit tests
+        run: python -m pytest tests/ -v --ignore=tests/test_integration.py
+
+  clickhouse-integration:
+    runs-on: ubuntu-latest
+    services:
+      clickhouse:
+        image: clickhouse/clickhouse-server:24.3
+        ports:
+          - 8123:8123
+        env:
+          CLICKHOUSE_DB: jet_analytics
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Wait for ClickHouse
+        run: |
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:8123/ping && break
+            sleep 2
+          done
+
+      - name: Init schema
+        env:
+          CLICKHOUSE_HOST: localhost
+          CLICKHOUSE_PASSWORD: ""
+        run: python scripts/init_clickhouse.py
+
+      - name: Generate and load data
+        env:
+          CLICKHOUSE_HOST: localhost
+          CLICKHOUSE_PASSWORD: ""
+        run: |
+          python scripts/generate_data.py --days 7 --output data/raw
+          python scripts/run_etl_local.py
+
+      - name: Run ad-hoc query
+        env:
+          CLICKHOUSE_HOST: localhost
+          CLICKHOUSE_PASSWORD: ""
+        run: python scripts/run_query.py -q q03 -p date_from=2025-01-01 date_to=2025-01-07

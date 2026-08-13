@@ -1,0 +1,11 @@
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = ["E", "F", "I", "W"]
+ignore = ["DTZ001", "DTZ011", "E501"]
+
+[lint.per-file-ignores]
+"dags/*" = ["I001"]
+"scripts/*" = ["E402"]
+"tests/*" = ["E402"]
