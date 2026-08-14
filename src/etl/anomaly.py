@@ -70,31 +70,35 @@ def detect_market_anomalies(target_date: date | None = None, lookback: int = 14)
         z_revenue = _z_score(row["total_revenue_usd"], row["avg_revenue"], row["std_revenue"])
 
         if z_revenue <= -Z_THRESHOLD:
-            anomalies.append({
-                "anomaly_date": target,
-                "market_id": int(row["market_id"]),
-                "zone_id": None,
-                "anomaly_type": "revenue_drop",
-                "metric_name": "total_revenue_usd",
-                "metric_value": float(row["total_revenue_usd"]),
-                "baseline_value": float(row["avg_revenue"]),
-                "z_score": round(z_revenue, 3),
-                "severity": "high" if z_revenue <= -3 else "medium",
-                "details": f"{row['city']}: выручка ниже baseline (z={z_revenue:.2f})",
-            })
+            anomalies.append(
+                {
+                    "anomaly_date": target,
+                    "market_id": int(row["market_id"]),
+                    "zone_id": None,
+                    "anomaly_type": "revenue_drop",
+                    "metric_name": "total_revenue_usd",
+                    "metric_value": float(row["total_revenue_usd"]),
+                    "baseline_value": float(row["avg_revenue"]),
+                    "z_score": round(z_revenue, 3),
+                    "severity": "high" if z_revenue <= -3 else "medium",
+                    "details": f"{row['city']}: выручка ниже baseline (z={z_revenue:.2f})",
+                }
+            )
         if z_rides <= -Z_THRESHOLD:
-            anomalies.append({
-                "anomaly_date": target,
-                "market_id": int(row["market_id"]),
-                "zone_id": None,
-                "anomaly_type": "ride_volume_drop",
-                "metric_name": "total_rides",
-                "metric_value": float(row["total_rides"]),
-                "baseline_value": float(row["avg_rides"]),
-                "z_score": round(z_rides, 3),
-                "severity": "high" if z_rides <= -3 else "medium",
-                "details": f"{row['city']}: падение поездок (z={z_rides:.2f})",
-            })
+            anomalies.append(
+                {
+                    "anomaly_date": target,
+                    "market_id": int(row["market_id"]),
+                    "zone_id": None,
+                    "anomaly_type": "ride_volume_drop",
+                    "metric_name": "total_rides",
+                    "metric_value": float(row["total_rides"]),
+                    "baseline_value": float(row["avg_rides"]),
+                    "z_score": round(z_rides, 3),
+                    "severity": "high" if z_rides <= -3 else "medium",
+                    "details": f"{row['city']}: падение поездок (z={z_rides:.2f})",
+                }
+            )
 
     return anomalies
 
@@ -137,18 +141,20 @@ def detect_idle_fleet_anomalies(target_date: date | None = None, lookback: int =
     for _, row in df.iterrows():
         z_idle = _z_score(row["idle_hours_pct"], row["avg_idle"], row["std_idle"])
         if z_idle >= Z_THRESHOLD:
-            anomalies.append({
-                "anomaly_date": target,
-                "market_id": int(row["market_id"]),
-                "zone_id": int(row["zone_id"]),
-                "anomaly_type": "idle_fleet",
-                "metric_name": "idle_hours_pct",
-                "metric_value": float(row["idle_hours_pct"]),
-                "baseline_value": float(row["avg_idle"]),
-                "z_score": round(z_idle, 3),
-                "severity": "high" if z_idle >= 3 else "medium",
-                "details": f"{row['city']} / {row['zone_name']}: простой парка +{(row['idle_hours_pct']-row['avg_idle'])*100:.1f}pp",
-            })
+            anomalies.append(
+                {
+                    "anomaly_date": target,
+                    "market_id": int(row["market_id"]),
+                    "zone_id": int(row["zone_id"]),
+                    "anomaly_type": "idle_fleet",
+                    "metric_name": "idle_hours_pct",
+                    "metric_value": float(row["idle_hours_pct"]),
+                    "baseline_value": float(row["avg_idle"]),
+                    "z_score": round(z_idle, 3),
+                    "severity": "high" if z_idle >= 3 else "medium",
+                    "details": f"{row['city']} / {row['zone_name']}: простой парка +{(row['idle_hours_pct']-row['avg_idle'])*100:.1f}pp",
+                }
+            )
     return anomalies
 
 
@@ -183,18 +189,20 @@ def detect_maintenance_spikes(target_date: date | None = None, lookback: int = 1
     for _, row in df.iterrows():
         z = _z_score(row["events"], row["avg_events"], row["std_events"])
         if z >= Z_THRESHOLD:
-            anomalies.append({
-                "anomaly_date": target,
-                "market_id": int(row["market_id"]),
-                "zone_id": None,
-                "anomaly_type": "maintenance_spike",
-                "metric_name": "maintenance_events",
-                "metric_value": float(row["events"]),
-                "baseline_value": float(row["avg_events"]),
-                "z_score": round(z, 3),
-                "severity": "high" if z >= 3 else "medium",
-                "details": f"{row['city']}: всплеск ремонтов ({row['events']} vs avg {row['avg_events']:.1f})",
-            })
+            anomalies.append(
+                {
+                    "anomaly_date": target,
+                    "market_id": int(row["market_id"]),
+                    "zone_id": None,
+                    "anomaly_type": "maintenance_spike",
+                    "metric_name": "maintenance_events",
+                    "metric_value": float(row["events"]),
+                    "baseline_value": float(row["avg_events"]),
+                    "z_score": round(z, 3),
+                    "severity": "high" if z >= 3 else "medium",
+                    "details": f"{row['city']}: всплеск ремонтов ({row['events']} vs avg {row['avg_events']:.1f})",
+                }
+            )
     return anomalies
 
 
@@ -203,6 +211,7 @@ def persist_anomalies(anomalies: list[dict]) -> int:
         return 0
     client = get_client()
     import pandas as pd
+
     df = pd.DataFrame(anomalies)
     client.insert_df("anomaly_log", df)
     logger.info("Persisted %d anomalies", len(anomalies))

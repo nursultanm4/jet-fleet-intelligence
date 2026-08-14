@@ -73,7 +73,9 @@ def fetch_zone_heatmap(market_code: str, days: int = 7) -> pd.DataFrame:
     return client.query_df(query)
 
 
-def fetch_rebalancing(market_code: str, target_date: date | None = None, limit: int = 20) -> pd.DataFrame:
+def fetch_rebalancing(
+    market_code: str, target_date: date | None = None, limit: int = 20
+) -> pd.DataFrame:
     client = get_client()
     td = target_date or (date.today() - timedelta(days=1))
     query = f"""
@@ -129,9 +131,15 @@ def build_weekly_market_report(output_path: Path | None = None) -> Path:
     col_letter = get_column_letter(rev_col)
     ws.conditional_formatting.add(
         f"{col_letter}{start_row + 1}:{col_letter}{data_end}",
-        ColorScaleRule(start_type="min", start_color="F8696B",
-                       mid_type="percentile", mid_value=50, mid_color="FFEB84",
-                       end_type="max", end_color="63BE7B"),
+        ColorScaleRule(
+            start_type="min",
+            start_color="F8696B",
+            mid_type="percentile",
+            mid_value=50,
+            mid_color="FFEB84",
+            end_type="max",
+            end_color="63BE7B",
+        ),
     )
 
     # Chart: revenue by market
@@ -161,7 +169,9 @@ def build_weekly_market_report(output_path: Path | None = None) -> Path:
     for ws_sheet in [ws, ws2]:
         for col in ws_sheet.columns:
             max_len = max(len(str(c.value or "")) for c in col)
-            ws_sheet.column_dimensions[get_column_letter(col[0].column)].width = min(max_len + 2, 40)
+            ws_sheet.column_dimensions[get_column_letter(col[0].column)].width = min(
+                max_len + 2, 40
+            )
 
     wb.save(output_path)
     return output_path
@@ -171,7 +181,9 @@ def build_rebalancing_sheet(market_code: str = "UZ", output_path: Path | None = 
     """Generate Ops Rebalancing Sheet for field teams."""
     TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    output_path = output_path or REPORTS_DIR / f"rebalancing_{market_code}_{date.today().isoformat()}.xlsx"
+    output_path = (
+        output_path or REPORTS_DIR / f"rebalancing_{market_code}_{date.today().isoformat()}.xlsx"
+    )
 
     df = fetch_rebalancing(market_code)
     wb = Workbook()
@@ -197,8 +209,7 @@ def build_rebalancing_sheet(market_code: str = "UZ", output_path: Path | None = 
     col_letter = get_column_letter(score_col)
     ws.conditional_formatting.add(
         f"{col_letter}{start + 1}:{col_letter}{end_row}",
-        ColorScaleRule(start_type="min", start_color="63BE7B",
-                       end_type="max", end_color="F8696B"),
+        ColorScaleRule(start_type="min", start_color="63BE7B", end_type="max", end_color="F8696B"),
     )
     ws.freeze_panes = f"A{start + 1}"
 

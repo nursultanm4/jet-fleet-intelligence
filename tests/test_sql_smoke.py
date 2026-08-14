@@ -33,6 +33,7 @@ def test_sql_file_has_select(sql_file: Path):
 
 def test_run_query_substitution():
     import importlib.util
+
     spec = importlib.util.spec_from_file_location(
         "run_query", PROJECT_ROOT / "scripts" / "run_query.py"
     )
@@ -40,16 +41,20 @@ def test_run_query_substitution():
     spec.loader.exec_module(run_query)
 
     query = run_query.load_query("q03")
-    result = run_query.substitute_params(query, {
-        "date_from": "2025-01-01",
-        "date_to": "2025-01-31",
-    })
+    result = run_query.substitute_params(
+        query,
+        {
+            "date_from": "2025-01-01",
+            "date_to": "2025-01-31",
+        },
+    )
     assert "toDate('2025-01-01')" in result
     assert "{date_from:Date}" not in result
 
 
 def test_all_queries_substitutable():
     import importlib.util
+
     spec = importlib.util.spec_from_file_location(
         "run_query", PROJECT_ROOT / "scripts" / "run_query.py"
     )
@@ -58,7 +63,9 @@ def test_all_queries_substitutable():
 
     for sql_file in SQL_DIR.glob("q*.sql"):
         query = run_query.load_query(sql_file.stem)
-        params = {m.group(1): run_query.DEFAULTS.get(m.group(1), "1")
-                  for m in re.finditer(r"\{(\w+):\w+\}", query)}
+        params = {
+            m.group(1): run_query.DEFAULTS.get(m.group(1), "1")
+            for m in re.finditer(r"\{(\w+):\w+\}", query)
+        }
         result = run_query.substitute_params(query, params)
         assert not re.search(r"\{\w+:\w+\}", result), f"Unresolved params in {sql_file.name}"

@@ -18,31 +18,37 @@ default_args = {
 
 def _validate():
     from src.etl.pipeline import validate_raw_files
+
     validate_raw_files()
 
 
 def _load_staging():
     from src.etl.pipeline import load_staging
+
     load_staging()
 
 
 def _load_dims():
     from src.etl.pipeline import load_dimensions
+
     load_dimensions()
 
 
 def _transform():
     from src.etl.pipeline import transform_to_marts
+
     transform_to_marts()
 
 
 def _refresh():
     from src.etl.pipeline import refresh_aggregates
+
     refresh_aggregates()
 
 
 def _dq():
     from src.etl.pipeline import data_quality_checks
+
     issues = data_quality_checks()
     if issues:
         raise ValueError(f"Data quality failed: {issues}")
@@ -82,4 +88,11 @@ with DAG(
         python_callable=_dq,
     )
 
-    validate_task >> load_dims_task >> load_staging_task >> transform_task >> refresh_task >> dq_task
+    (
+        validate_task
+        >> load_dims_task
+        >> load_staging_task
+        >> transform_task
+        >> refresh_task
+        >> dq_task
+    )

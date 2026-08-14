@@ -17,12 +17,14 @@ default_args = {
 
 def _build_excel():
     from src.excel.report_builder import build_weekly_market_report
+
     path = build_weekly_market_report()
     print(f"Weekly report: {path}")
 
 
 def _build_rebalancing():
     from src.excel.report_builder import build_rebalancing_sheet
+
     for code in ("UZ", "BR", "KZ"):
         path = build_rebalancing_sheet(code)
         print(f"Rebalancing sheet: {path}")
@@ -30,6 +32,7 @@ def _build_rebalancing():
 
 def _build_html():
     from src.excel.report_builder import build_plotly_html
+
     path = build_plotly_html()
     print(f"Plotly HTML: {path}")
 
@@ -44,7 +47,9 @@ with DAG(
     tags=["jet", "excel", "report"],
 ) as dag:
     excel_task = PythonOperator(task_id="build_weekly_excel", python_callable=_build_excel)
-    rebalancing_task = PythonOperator(task_id="build_rebalancing_sheets", python_callable=_build_rebalancing)
+    rebalancing_task = PythonOperator(
+        task_id="build_rebalancing_sheets", python_callable=_build_rebalancing
+    )
     html_task = PythonOperator(task_id="build_plotly_html", python_callable=_build_html)
 
     excel_task >> rebalancing_task >> html_task

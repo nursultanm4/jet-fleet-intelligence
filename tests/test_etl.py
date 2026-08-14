@@ -23,7 +23,12 @@ def small_config():
 def test_generate_all_produces_expected_tables(small_config):
     datasets = generate_all(small_config)
     assert set(datasets.keys()) == {
-        "dim_zone", "dim_scooter", "dim_user", "rides", "scooter_status", "maintenance"
+        "dim_zone",
+        "dim_scooter",
+        "dim_user",
+        "rides",
+        "scooter_status",
+        "maintenance",
     }
     assert len(datasets["rides"]) > 0
     assert len(datasets["dim_zone"]) >= 6

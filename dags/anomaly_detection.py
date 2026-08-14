@@ -20,6 +20,7 @@ INSIGHTS_LOG = Path("/opt/jet_analytics/docs/insights/anomaly_log.md")
 
 def _detect():
     from src.etl.anomaly import run_detection
+
     anomalies = run_detection()
     print(f"Detected {len(anomalies)} anomalies")
     if anomalies:

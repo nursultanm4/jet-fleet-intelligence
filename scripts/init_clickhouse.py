@@ -34,9 +34,7 @@ def main() -> None:
         client.command(MARKET_SEED)
     # Migration: battery_capacity Wh values exceed UInt8
     try:
-        client.command(
-            "ALTER TABLE dim_scooter MODIFY COLUMN battery_capacity UInt16"
-        )
+        client.command("ALTER TABLE dim_scooter MODIFY COLUMN battery_capacity UInt16")
     except Exception:
         pass
     print("ClickHouse schema initialized.")

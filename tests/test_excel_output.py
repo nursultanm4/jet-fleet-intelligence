@@ -9,6 +9,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 def test_report_builder_imports():
     from src.excel import report_builder
+
     assert hasattr(report_builder, "build_weekly_market_report")
     assert hasattr(report_builder, "build_rebalancing_sheet")
     assert hasattr(report_builder, "build_plotly_html")

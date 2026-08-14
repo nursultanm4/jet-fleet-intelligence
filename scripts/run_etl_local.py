@@ -1,4 +1,4 @@
-""" Run ETL pipeline locally with out Airflow """
+"""Run ETL pipeline locally with out Airflow"""
 
 from __future__ import annotations
 

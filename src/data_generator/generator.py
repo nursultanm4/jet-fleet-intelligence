@@ -13,13 +13,62 @@ import pandas as pd
 SEED = 42
 
 MARKETS = [
-    {"market_id": 1, "country_code": "KZ", "city": "Almaty", "fleet": 120, "base_fare": 350, "per_min": 45},
-    {"market_id": 2, "country_code": "KZ", "city": "Astana", "fleet": 80, "base_fare": 350, "per_min": 45},
-    {"market_id": 3, "country_code": "UZ", "city": "Tashkent", "fleet": 100, "base_fare": 8000, "per_min": 900},
-    {"market_id": 4, "country_code": "AZ", "city": "Baku", "fleet": 70, "base_fare": 1.5, "per_min": 0.15},
-    {"market_id": 5, "country_code": "GE", "city": "Tbilisi", "fleet": 60, "base_fare": 2.0, "per_min": 0.20},
-    {"market_id": 6, "country_code": "MN", "city": "Ulaanbaatar", "fleet": 40, "base_fare": 1500, "per_min": 180},
-    {"market_id": 7, "country_code": "BR", "city": "Sao Paulo", "fleet": 150, "base_fare": 4.0, "per_min": 0.50},
+    {
+        "market_id": 1,
+        "country_code": "KZ",
+        "city": "Almaty",
+        "fleet": 120,
+        "base_fare": 350,
+        "per_min": 45,
+    },
+    {
+        "market_id": 2,
+        "country_code": "KZ",
+        "city": "Astana",
+        "fleet": 80,
+        "base_fare": 350,
+        "per_min": 45,
+    },
+    {
+        "market_id": 3,
+        "country_code": "UZ",
+        "city": "Tashkent",
+        "fleet": 100,
+        "base_fare": 8000,
+        "per_min": 900,
+    },
+    {
+        "market_id": 4,
+        "country_code": "AZ",
+        "city": "Baku",
+        "fleet": 70,
+        "base_fare": 1.5,
+        "per_min": 0.15,
+    },
+    {
+        "market_id": 5,
+        "country_code": "GE",
+        "city": "Tbilisi",
+        "fleet": 60,
+        "base_fare": 2.0,
+        "per_min": 0.20,
+    },
+    {
+        "market_id": 6,
+        "country_code": "MN",
+        "city": "Ulaanbaatar",
+        "fleet": 40,
+        "base_fare": 1500,
+        "per_min": 180,
+    },
+    {
+        "market_id": 7,
+        "country_code": "BR",
+        "city": "Sao Paulo",
+        "fleet": 150,
+        "base_fare": 4.0,
+        "per_min": 0.50,
+    },
 ]
 
 ZONE_TYPES = ["downtown", "suburb", "university", "transit_hub"]
@@ -162,9 +211,7 @@ def generate_rides(
             minutes = rng.integers(0, 60, size=n)
             durations = rng.integers(180, 2400, size=n)
             distances = (durations * rng.uniform(0.08, 0.15, size=n)).astype(int)
-            fare_local = np.round(
-                market["base_fare"] + (durations / 60) * market["per_min"], 2
-            )
+            fare_local = np.round(market["base_fare"] + (durations / 60) * market["per_min"], 2)
             fare_usd = np.round(fare_local * USD_RATES[market["market_id"]], 4)
 
             scooter_ids = market_scooters["scooter_id"].values
@@ -287,7 +334,9 @@ def generate_maintenance(
             market_zones = zones[zones["market_id"] == market["market_id"]]["zone_id"].tolist()
             for _ in range(n_events):
                 scooter = market_scooters.sample(1).iloc[0]
-                started = datetime.combine(d, datetime.min.time()) + timedelta(hours=int(rng.integers(6, 20)))
+                started = datetime.combine(d, datetime.min.time()) + timedelta(
+                    hours=int(rng.integers(6, 20))
+                )
                 downtime = round(float(rng.uniform(1, 12)), 2)
                 rows.append(
                     {

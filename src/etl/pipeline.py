@@ -13,16 +13,41 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 RAW_DIR = PROJECT_ROOT / "data" / "raw"
 
 RIDE_COLUMNS = [
-    "ride_id", "user_id", "scooter_id", "market_id", "start_zone_id", "end_zone_id",
-    "started_at", "ended_at", "distance_m", "duration_sec", "fare_local", "fare_usd", "ride_date",
+    "ride_id",
+    "user_id",
+    "scooter_id",
+    "market_id",
+    "start_zone_id",
+    "end_zone_id",
+    "started_at",
+    "ended_at",
+    "distance_m",
+    "duration_sec",
+    "fare_local",
+    "fare_usd",
+    "ride_date",
 ]
 STATUS_COLUMNS = [
-    "snapshot_at", "scooter_id", "market_id", "zone_id", "lat", "lon",
-    "battery_pct", "status", "snapshot_date",
+    "snapshot_at",
+    "scooter_id",
+    "market_id",
+    "zone_id",
+    "lat",
+    "lon",
+    "battery_pct",
+    "status",
+    "snapshot_date",
 ]
 MAINTENANCE_COLUMNS = [
-    "event_id", "scooter_id", "market_id", "zone_id", "started_at",
-    "ended_at", "downtime_hours", "issue_type", "event_date",
+    "event_id",
+    "scooter_id",
+    "market_id",
+    "zone_id",
+    "started_at",
+    "ended_at",
+    "downtime_hours",
+    "issue_type",
+    "event_date",
 ]
 
 
@@ -194,15 +219,11 @@ def data_quality_checks() -> list[str]:
     client = get_client()
     issues = []
 
-    dup_rides = client.command(
-        "SELECT count() - uniqExact(ride_id) FROM fact_rides"
-    )
+    dup_rides = client.command("SELECT count() - uniqExact(ride_id) FROM fact_rides")
     if dup_rides > 0:
         issues.append(f"Duplicate ride_ids: {dup_rides}")
 
-    null_fares = client.command(
-        "SELECT countIf(fare_usd IS NULL OR fare_usd = 0) FROM fact_rides"
-    )
+    null_fares = client.command("SELECT countIf(fare_usd IS NULL OR fare_usd = 0) FROM fact_rides")
     if null_fares > 0:
         issues.append(f"Null/zero fares: {null_fares}")
 

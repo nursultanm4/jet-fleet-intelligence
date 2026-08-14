@@ -1,4 +1,4 @@
-"""Generate synthetic (fake) JET micromobility datasets """
+"""Generate synthetic (fake) JET micromobility datasets"""
 
 from __future__ import annotations
 

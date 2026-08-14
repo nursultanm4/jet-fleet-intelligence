@@ -70,7 +70,9 @@ def substitute_params(query: str, params: dict) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run ad-hoc ClickHouse queries")
-    parser.add_argument("--query", "-q", required=True, help="Query name e.g. q03 or q03_revenue_per_scooter")
+    parser.add_argument(
+        "--query", "-q", required=True, help="Query name e.g. q03 or q03_revenue_per_scooter"
+    )
     parser.add_argument("--params", "-p", nargs="*", default=[], help="key=value params")
     parser.add_argument("--output", "-o", help="Save results to CSV")
     args = parser.parse_args()
