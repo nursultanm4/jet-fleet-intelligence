@@ -1,0 +1,57 @@
+repos:
+  # Ruff linting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.7
+    hooks:
+      - id: ruff
+        name: Ruff lint
+        args: [--fix, src, scripts, dags, tests]
+        exclude: ^(migrations/|\.venv)
+
+  # Ruff formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.7
+    hooks:
+      - id: ruff-format
+        name: Ruff format
+        args: [src, scripts, dags, tests]
+        exclude: ^(migrations/|\.venv)
+
+  # YAML validation
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+        name: Check YAML syntax
+        args: [--unsafe]
+      - id: check-json
+        name: Check JSON syntax
+      - id: check-merge-conflict
+        name: Check for merge conflicts
+      - id: end-of-file-fixer
+        name: Fix EOF newlines
+      - id: trailing-whitespace
+        name: Trim trailing whitespace
+
+  # python syntax check
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-ast
+        name: Check Python AST
+
+  # Pytest (fast subset, not full suite)
+  - repo: local
+    hooks:
+      - id: pytest-quick
+        name: Pytest smoke tests
+        entry: python -m pytest tests/test_etl.py tests/test_excel_output.py -x -q
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [commit]
+        always_run: false
+
+# CI: run all hooks; local dev: skip pytest-quick if you want faster commits
+# To skip pytest: SKIP=pytest-quick git commit -m "message"
+# To run manually: pre-commit run --all-files
