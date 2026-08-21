@@ -1,12 +1,12 @@
-# Архитектура Jet Fleet Intelligence
+# Architecture Jet Fleet Intelligence
 
-## Обзор
+## Overall
 
-Платформа аналитики микромобильности JET Group: синтетические данные → CSV → Airflow ETL → ClickHouse → Excel/HTML отчёты и ad-hoc SQL.
+JET Group micromobility analytics platform: synthetic data → CSV → Airflow ETL → ClickHouse → Excel/HTML reports and ad-hoc SQL.
 
-## Компоненты
+## Components
 
-| Компонент | Технология | Назначение |
+| Component | Technology | Role |
 |-----------|------------|------------|
 | Orchestration | Apache Airflow 2.9 | 3 DAG: ETL, reports, anomalies |
 | Storage | ClickHouse 24 | OLAP, star schema, aggregates |
@@ -31,12 +31,12 @@ weekly_market_report (Mon 08:00 UTC)
 3. `weekly_market_report` → `reports/weekly/*.xlsx`
 4. `anomaly_detection` → `anomaly_log` + `docs/insights/anomaly_log.md`
 
-## Локальный запуск
+## Local run
 
 ```bash
 make up          # Docker: ClickHouse + Airflow
 make seed        # generate + init-db
-make run-etl     # ETL без Airflow
+make run-etl     # ETL without Airflow
 make report      # Excel + HTML
 ```
 
