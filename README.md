@@ -1,36 +1,36 @@
 # Jet Fleet Intelligence
 
-End-to-end аналитическая платформа для операций микромобильности: автоматизация в Airflow, хранение в ClickHouse, ad-hoc SQL, Excel-отчёты для ops-команд и документированные бизнес-инсайты.
+End-to-end analytics platform for micromobility operations: Airflow automation, ClickHouse storage, ad-hoc SQL, Excel reports for ops teams, and documented business insights.
 
 [CI](https://github.com/nursultanm4/Jet_DataAnalyst/actions/workflows/ci.yml)
 
 ---
 
-***Данные синтетические, не содержат реальной информации JET.*
+***Data is synthetic and does not contain real JET information.*
 
 ## About
 
-JET Group - лидер микромобильности в Казахстане, Центральной Азии, на Кавказе и в Латинской Америке. Этот репозиторий демонстрирует типичные задачи аналитика JET:
+JET Group is a leading micromobility operator across Kazakhstan, Central Asia, the Caucasus, and Latin America. This repository demonstrates typical workflows and tasks of a JET Data Analyst:
 
 
-| Задача                           | Реализация                                        |
+| Task | Implementation |
 | -------------------------------- | ------------------------------------------------- |
-| Автоматизация в Airflow (Python) | 3 DAG: ETL, отчёты, аномалии                      |
-| Excel                            | Weekly Market Performance + Ops Rebalancing Sheet |
-| Ad-hoc запросы                   | 15 SQL-шаблонов + CLI                             |
-| ClickHouse + SQL                 | Star schema, materialized views, OLAP             |
-| Визуализация и инсайты           | Plotly HTML, Excel charts, `docs/insights/`       |
+| Airflow Automation (Python) | 3 DAGs: ETL, reporting, anomaly detection |
+| Excel | Weekly Market Performance + Ops Rebalancing Sheet |
+| Ad-hoc Queries | 15 SQL templates + CLI |
+| ClickHouse + SQL | Star schema, materialized views, OLAP |
+| Visualization & Insights | Plotly HTML, Excel charts, `docs/insights/` |
 
 
-### Уникальные фичи
+### Key Features
 
-- **6 рынков** (KZ, UZ, AZ, GE, MN, BR) с синтетическими данными за 90 дней
-- **Rebalancing Score** — метрика приоритизации перераспределения самокатов
-- **Встроенные аномалии** — простой парка в Ташкенте, падение выручки в São Paulo, maintenance spike в Almaty
+- **6 markets** (KZ, UZ, AZ, GE, MN, BR) with 90 days of synthetic data
+- **Rebalancing Score** — scooter repositioning prioritization metric
+- **Built-in anomalies** — fleet idle spike in Tashkent, revenue drop in São Paulo, maintenance spike in Almaty
 
 ---
 
-## Архитектура
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -45,30 +45,30 @@ flowchart LR
 
 
 
-Подробнее: [docs/architecture.md](docs/architecture.md)
+Learn more: [docs/architecture.md](docs/architecture.md)
 
 ---
 
 ## Quick Start
 
-### Требования
+### Requirements
 
 - Docker & Docker Compose
-- Python 3.11+ (для локальных скриптов)
+- Python 3.11+ (for local scripts)
 
-### Запуск
+### Getting Started
 
 ```bash
-# 1. Клонировать и настроить
+# 1. Clone and configure
 cp .env.example .env
 
-# 2. Поднять инфраструктуру
+# 2. Start infrastructure
 make up
 
-# 3. Сгенерировать данные и инициализировать ClickHouse
+# 3. Generate data and initialize ClickHouse
 make seed
 
-# 4. Загрузить данные (локально или через Airflow UI)
+# 4. Ingest data (locally or via Airflow UI)
 make run-etl
 ```
 
@@ -78,74 +78,74 @@ make run-etl
 ### Airflow DAGs
 
 
-| DAG                    | Расписание      | Описание                           |
+| DAG | Schedule | Description |
 | ---------------------- | --------------- | ---------------------------------- |
-| `daily_fleet_etl`      | 06:00 UTC daily | CSV → staging → marts → aggregates |
-| `anomaly_detection`    | 07:00 UTC daily | z-score аномалии → anomaly_log     |
-| `weekly_market_report` | Mon 08:00 UTC   | Excel + Plotly по рынкам           |
+| `daily_fleet_etl` | 06:00 UTC daily | CSV → staging → marts → aggregates |
+| `anomaly_detection` | 07:00 UTC daily | z-score anomalies → anomaly_log |
+| `weekly_market_report` | Mon 08:00 UTC | Excel + Plotly by market |
 
 
 ---
 
-## Ad-hoc запросы
+## Ad-hoc Queries
 
 ```bash
-# DAU по рынкам
+# DAU by market
 python scripts/run_query.py -q q01 -p date_from=2025-01-01 date_to=2025-01-31
 
-# Rebalancing Score для UZ
+# Rebalancing Score for UZ
 python scripts/run_query.py -q q10 -p market_code=UZ limit=20
 
 # Unit economics
 python scripts/run_query.py -q q03
 ```
 
-Все запросы: [sql/adhoc/](sql/adhoc/)
+All queries: [sql/adhoc/](sql/adhoc/)
 
 ---
 
-## Excel-отчёты
+## Excel Reports
 
 ```bash
 make report
 ```
 
-Генерирует:
+Generates:
 
-- `reports/weekly/weekly_market_*.xlsx` — сводка по рынкам, heatmap зон UZ
-- `reports/weekly/rebalancing_{UZ,BR,KZ}_*.xlsx` — ops-листы с Rebalancing Score
-- `reports/weekly/weekly_chart_*.html` — интерактивная визуализация
+- `reports/weekly/weekly_market_*.xlsx` — market summary, UZ zone heatmap
+- `reports/weekly/rebalancing_{UZ,BR,KZ}_*.xlsx` — ops sheets with Rebalancing Score
+- `reports/weekly/weekly_chart_*.html` — interactive visualizations
 
 ---
 
-## Бизнес-инсайты
+## Business Insights
 
 
-| Отчёт                                                                                | Тема                           |
+| Report | Topic |
 | ------------------------------------------------------------------------------------ | ------------------------------ |
-| [01_tashkent_idle_fleet.md](docs/insights/01_tashkent_idle_fleet.md)                 | Простой парка +40% в suburb UZ |
-| [02_sao_paulo_revenue_drop.md](docs/insights/02_sao_paulo_revenue_drop.md)           | Падение выручки −25% BR        |
-| [03_rebalancing_recommendations.md](docs/insights/03_rebalancing_recommendations.md) | Ops playbook + ROI             |
+| [01_tashkent_idle_fleet.md](docs/insights/01_tashkent_idle_fleet.md) | +40% idle fleet in UZ suburbs |
+| [02_sao_paulo_revenue_drop.md](docs/insights/02_sao_paulo_revenue_drop.md) | −25% revenue drop in BR |
+| [03_rebalancing_recommendations.md](docs/insights/03_rebalancing_recommendations.md) | Ops playbook + ROI |
 
 
 ---
 
-## Бизнес-метрики
+## Business Metrics
 
 
-| Метрика             | Описание                 |
+| Metric | Description |
 | ------------------- | ------------------------ |
-| Utilization rate    | rides / active_scooters  |
-| Revenue/scooter/day | unit economics           |
-| Idle rate           | доля available snapshots |
-| Rebalancing Score   | приоритет repositioning  |
+| Utilization rate | rides / active_scooters |
+| Revenue/scooter/day | unit economics |
+| Idle rate | share of available snapshots |
+| Rebalancing Score | repositioning priority |
 
 
-Словарь данных: [docs/data_dictionary.md](docs/data_dictionary.md)
+Data dictionary: [docs/data_dictionary.md](docs/data_dictionary.md)
 
 ---
 
-## Структура репозитория
+## Repository Structure
 
 ```
 Jet_DataAnalyst/
@@ -160,7 +160,7 @@ Jet_DataAnalyst/
 
 ---
 
-## Тестирование
+## Testing
 
 ```bash
 pip install -r requirements.txt
@@ -169,4 +169,3 @@ make lint
 ```
 
 ---
-
